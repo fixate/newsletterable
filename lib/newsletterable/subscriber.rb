@@ -47,7 +47,7 @@ module Newsletterable
 			subscription_service.update(list_ids, old_email)
 		end
 
-		def remove_subscription
+		def remove_subscription(list_name)
 			list_ids = resolve_list(list_name)
 			subscription_service.unsubscribe(list_ids)
 		end
@@ -74,7 +74,9 @@ module Newsletterable
 
 				after_save     -> { manage_subscription(list_name) }, if: :"#{field}_changed?"
 				around_update  -> { update_subscription(list_name) }, if: -> { send(:"#{field}?") && email_changed? }
-				before_destroy -> { remove_subscription(list_name) }, if: :"#{field}?"
+				unless options[:unsubscribeable]
+					before_destroy -> { remove_subscription(list_name) }, if: :"#{field}?"
+				end
 			end
 
 		end

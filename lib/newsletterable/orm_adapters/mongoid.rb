@@ -1,6 +1,8 @@
+require 'newsletterable/orm_adapters/active_model'
+
 module Newsletterable
 	module OrmAdapters
-		class Mongoid < ActiveRecord
+		class Mongoid < ActiveModel
 			def save(record)
 				record.with(safe: true).save!
 			end

@@ -4,7 +4,7 @@ module Newsletterable
 
 			def self.factory(name)
 				klass = "Newsletterable::OrmAdapters::#{name.to_s.camelize}"
-				unless defined?(klass)
+				unless (Module.const_get(klass).is_a?(Class) rescue false)
 					require "newsletterable/orm_adapters/#{name}"
 				end
 				klass.constantize.new
