@@ -55,7 +55,7 @@ module Newsletterable
 		end
 
 		def add(subscription)
-			mailchimp.lists.subscribe(subscription.list, { email: subscription.email })
+			mailchimp.lists.subscribe(subscription.list, { email: subscription.email }, {}, 'html', false)
 		rescue Mailchimp::ListAlreadySubscribedError
 			logger.warn "#{subscription.email} already subscribed to '#{subscription.list}'."
 		end
