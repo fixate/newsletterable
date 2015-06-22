@@ -11,4 +11,5 @@
 *.so
 *.o
 *.a
+spec/examples.txt
 mkmf.log

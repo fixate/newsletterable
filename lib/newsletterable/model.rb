@@ -10,7 +10,7 @@ module Newsletterable
     end
 
 		def email
-			subscriber.nil? ? self.old_email : subscriber.email
+			subscribable.nil? ? self.old_email : subscribable.email
 		end
 
 		def enqueue_subscription

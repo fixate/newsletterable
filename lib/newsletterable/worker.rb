@@ -1,3 +1,5 @@
+require 'mailchimp'
+
 module Newsletterable
 	module Worker
 		extend ActiveSupport::Concern
@@ -14,9 +16,9 @@ module Newsletterable
 
 		def process
 			logger.info "Processing mailing list subscription for #{@subscription.email}..."
-			logger.debug "Status: [#{@subscription.status}]"
+			logger.debug "Status: [#{@subscription.state}]"
 
-			case @subscription.status
+			case @subscription.state.to_sym
 			when :pending || :error
 				logger.info "Subscribing #{@subscription.email} to '#{@subscription.list}' list"
 				logger.info "Trying to subscribe after previous error!" if @subscription.error?
@@ -45,7 +47,11 @@ module Newsletterable
 		private
 
 		def orm_adapter
-			@orm_adapter ||= Adapter.factory(Newsletterable.configuration.orm_adapter)
+			@orm_adapter ||= OrmAdapters::Adapter.factory(Newsletterable.configuration.orm_adapter)
+		end
+
+		def mailchimp
+      @mailchimp_api ||= Mailchimp::API.new(Newsletterable.configuration.api_key)
 		end
 
 		def add(subscription)

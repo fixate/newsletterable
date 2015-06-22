@@ -74,7 +74,7 @@ module Newsletterable
 
 				after_save     -> { manage_subscription(list_name) }, if: :"#{field}_changed?"
 				around_update  -> { update_subscription(list_name) }, if: -> { send(:"#{field}?") && email_changed? }
-				unless options[:unsubscribeable]
+				unless options[:unsubscribe_on_destroy]
 					before_destroy -> { remove_subscription(list_name) }, if: :"#{field}?"
 				end
 			end

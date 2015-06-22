@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe Newsletterable::Service do
-	let(:subscriptionable) { double(:subscriptionable) }
+	let(:subscribable) { double(:subscribable, email: 'test@example.com') }
 	let(:subscription) { double(:subscription) }
 
-	subject { described_class.new(subscriptionable) }
+	subject { described_class.new(subscribable) }
 
 	before do
 		Newsletterable.configure do |config|
@@ -24,6 +24,8 @@ RSpec.describe Newsletterable::Service do
 
 	describe '#unsubscribe' do
 		before do
+			allow(subscription).to receive('old_email=')
+			allow(subscription).to receive(:unsubscribed!)
 			Newsletterable::OrmAdapters::TestOrmAdapter.query_subscription =
 				subscription
 
@@ -36,6 +38,11 @@ RSpec.describe Newsletterable::Service do
 
 		it 'sets to unsubscribed' do
 			expect(subscription).to receive(:unsubscribed!)
+			subject.unsubscribe(%w[ 123 ])
+		end
+
+		it 'sets the old_email' do
+			expect(subscription).to receive('old_email=')
 			subject.unsubscribe(%w[ 123 ])
 		end
 	end

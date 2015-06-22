@@ -1,15 +1,15 @@
 module Newsletterable
 	class Service
-		attr_reader :subscriptionable
+		attr_reader :subscribable
 
-		def initialize(subscriptionable)
-			@subscriptionable = subscriptionable
+		def initialize(subscribable)
+			@subscribable = subscribable
 		end
 
 		def subscribe(lists)
 			lists.each do |list|
 				subscription = orm_adapter.query_subscription({
-					subscriptionable: subscriptionable,
+					subscribable: subscribable,
 					list: list
 				}, true)
 
@@ -24,10 +24,11 @@ module Newsletterable
 		def unsubscribe(lists)
 			lists.each do |list|
 				subscription = orm_adapter.query_subscription(
-					subscriptionable: subscriptionable,
+					subscribable: subscribable,
 					list: list
 				)
 				unless subscription.nil?
+					subscription.old_email = subscribable.email
 					subscription.unsubscribed!
 					orm_adapter.save(subscription)
 				end
@@ -37,12 +38,12 @@ module Newsletterable
 		def update(lists, old_email)
 			lists.each do |list|
 				subscription = orm_adapter.query_subscription(
-					subscriptionable: subscriptionable,
+					subscribable: subscribable,
 					list: list
 				)
 
 				if subscription.nil?
-					raise RuntimeError, "No subscription to update for subscriptionable #{subscriptionable.id}."
+					raise RuntimeError, "No subscription to update for subscribable #{subscribable.id}."
 				end
 
 				subscription.out_of_date!
