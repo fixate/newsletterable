@@ -27,7 +27,7 @@ module Newsletterable
 					subscribable: subscribable,
 					list: list
 				)
-				unless subscription.nil?
+				if !subscription.nil? && subscription.subscribed?
 					subscription.old_email = subscribable.email
 					subscription.unsubscribed!
 					orm_adapter.save(subscription)

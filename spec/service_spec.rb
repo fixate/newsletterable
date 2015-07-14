@@ -28,6 +28,8 @@ RSpec.describe Newsletterable::Service do
 			allow(subscription).to receive(:unsubscribed!)
 			Newsletterable::OrmAdapters::TestOrmAdapter.query_subscription =
 				subscription
+			allow(subscription).to receive(:unsubscribed?).and_return(false)
+			allow(subscription).to receive(:subscribed?).and_return(true)
 
 			allow(subscription).to receive(:save!)
 		end
@@ -43,6 +45,13 @@ RSpec.describe Newsletterable::Service do
 
 		it 'sets the old_email' do
 			expect(subscription).to receive('old_email=')
+			subject.unsubscribe(%w[ 123 ])
+		end
+
+		it 'doesnt unsuubscribe of already ubsubscribed' do
+			allow(subscription).to receive(:unsubscribed?).and_return(true)
+			allow(subscription).to receive(:subscribed?).and_return(false)
+			expect(subscription).to_not receive(:unsubscribed!)
 			subject.unsubscribe(%w[ 123 ])
 		end
 	end
