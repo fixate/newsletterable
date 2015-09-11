@@ -20,12 +20,20 @@ RSpec.describe Newsletterable::Subscriber do
 
 		before do
 			allow(subject).to receive(:subscription_service).and_return(subscription_service)
+			subject.newsletter = true
 		end
 
 		it 'subscribes to list' do
-			subject.newsletter = true
 			expect(subscription_service).to receive(:subscribe).with(['nwsltr'])
 			subject.manage_subscription(:newsletter)
+		end
+
+		it 'updates subscription' do
+			subject.email = 'new@email.com'
+			subject.old_email = 'foo@bar.com'
+			Newsletterable.configuration.old_email_getter = -> (user) { user.old_email }
+			expect(subscription_service).to receive(:update).with(['nwsltr'], 'foo@bar.com')
+			subject.update_subscription(:newsletter) {  }
 		end
 
 		it 'unsubscribes from list' do

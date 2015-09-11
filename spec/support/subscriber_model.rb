@@ -9,7 +9,7 @@ class SubscriberModel
 
 	include Newsletterable::Subscriber
 
-	attr_accessor :email, :newsletter, :everyone
+	attr_accessor :email, :old_email, :newsletter, :everyone
 
 	subscribe_on :newsletter
 	subscribe_on :everyone
