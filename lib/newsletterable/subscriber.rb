@@ -73,7 +73,7 @@ module Newsletterable
 				self.__newsletterable_options[list_name] = options.merge(field: field)
 
 				after_save     -> { manage_subscription(list_name) }, if: :"#{field}_changed?"
-				around_update  -> { update_subscription(list_name) }, if: -> { send(:"#{field}?") && email_changed? }
+				around_update  -> (&block) { update_subscription(list_name, &block) }, if: -> { send(:"#{field}?") && email_changed? }
 				unless options[:unsubscribe_on_destroy]
 					before_destroy -> { remove_subscription(list_name) }, if: :"#{field}?"
 				end
