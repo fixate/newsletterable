@@ -35,12 +35,30 @@ module Newsletterable
 	def defaults
 		{
 			worker: Newsletterable::Worker,
-			list_resolver: default_list_resolver
+			list_resolver: default_list_resolver,
+			old_email_getter: -> (subscriber) {
+				if subscriber.respond_to?(:old_email)
+					subscriber.old_email
+				elsif subscriber.respond_to?(:email_was)
+					subscriber.email_was
+				else
+					raise ConfigurationError, <<-TEXT, __FILE__, __LINE__ + 1
+						Unable to retreive old email for update. Perhaps consider
+						implementing 'old_email_getter' in your newsletterable initializer.
+
+						e.g.
+						config.old_email_getter = -> (user) do
+							# Get the updated email address from your model
+							user.email_before_update
+						end
+					TEXT
+				end
+			}
 		}
 	end
 
 	def default_list_resolver
-		proc do |subscriber, list_name, lists|
+		-> (subscriber, list_name, lists) do
 			result = case lists
 			when String, Array
 				lists

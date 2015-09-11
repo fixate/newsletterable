@@ -39,7 +39,7 @@ module Newsletterable
 		end
 
 		def update_subscription(list_name)
-			old_email = email_was
+			old_email = Newsletterable.configuration.old_email_getter.call(self)
 
 			yield
 
