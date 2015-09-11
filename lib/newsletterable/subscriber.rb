@@ -65,7 +65,6 @@ module Newsletterable
 		end
 
 		module ClassMethods
-
 			def subscribe_on(list_name, options = {})
 				field = options[:field] || list_name
 
@@ -73,12 +72,14 @@ module Newsletterable
 				self.__newsletterable_options[list_name] = options.merge(field: field)
 
 				after_save     -> { manage_subscription(list_name) }, if: :"#{field}_changed?"
-				around_update  -> (&block) { update_subscription(list_name, &block) }, if: -> { send(:"#{field}?") && email_changed? }
+				define_method :"update_subscription_#{list_name}" do |&block|
+					update_subscription(list_name, &block)
+				end
+				around_update  :"update_subscription_#{list_name}", if: -> { send(:"#{field}?") && email_changed? }
 				unless options[:unsubscribe_on_destroy]
 					before_destroy -> { remove_subscription(list_name) }, if: :"#{field}?"
 				end
 			end
-
 		end
 	end
 end
